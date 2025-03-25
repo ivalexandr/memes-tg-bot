@@ -12,8 +12,8 @@ export class DatabaseService {
   constructor(@inject(LoggerService) private loggerSrv: LoggerInterface) {
     const logging = process.env.NODE_ENV === 'development';
     this._datasource = new DataSource({
-      type: 'sqlite',
-      database: `${__dirname}/../memes_bot.sqlite`,
+      type: 'better-sqlite3',
+      database: `${__dirname}/../db/memes_bot.sqlite`,
       synchronize: true,
       logging,
       entities: [User, Memes],
