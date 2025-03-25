@@ -13,7 +13,6 @@ export class User {
   nickname!: string;
 
   @Column('int')
-  @Index({ unique: true })
   role!: Role;
 
   @Column('text')
