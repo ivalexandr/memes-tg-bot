@@ -1,0 +1,14 @@
+services:
+  app:
+    image: ivalexandr/memes-bot:latest
+    container_name: memes-bot
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/app/dist/memes
+      - ./data:/app/dist/database/db
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - NODE_ENV=${NODE_ENV}
+      - OWNER_ID=${OWNER_ID}
+    restart: unless-stopped
