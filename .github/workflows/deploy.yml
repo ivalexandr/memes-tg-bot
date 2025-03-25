@@ -61,6 +61,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            cd ./app
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
             docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
             docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
