@@ -63,7 +63,7 @@ export class AssignAction {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
         }
-
+        console.log(error);
         await ctx.reply(
           'Произошла ошибка назначения пользователя админом, попробуй позже'
         );
