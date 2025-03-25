@@ -32,7 +32,7 @@ jobs:
           cp ${{ env.DOCKER_COMPOSE_FILE }} deploy/
 
       - name: Upload files to VPS
-        uses: appleboy/scp-action@v1
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
