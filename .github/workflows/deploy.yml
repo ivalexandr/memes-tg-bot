@@ -26,6 +26,34 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
 
+      - name: Prepare deployment files
+        run: |
+          mkdir -p deploy
+          cp ${{ env.DOCKER_COMPOSE_FILE }} deploy/
+
+      - name: Upload files to VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: 'deploy/*'
+          target: '~/app/'
+          strip_components: 1
+
+      - name: Create .env on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cat > ~/app/.env <<EOF
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            NODE_ENV=${{ secrets.NODE_ENV }}
+            OWNER_ID=${{ secrets.OWNER_ID }}
+            EOF
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
         with:
