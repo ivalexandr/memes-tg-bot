@@ -9,7 +9,7 @@ env:
   VPS_USER: ${{ secrets.VPS_USER }}
   VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
   DOCKER_IMAGE: memes-bot
-  DOCKER_COMPOSE_FILE: docker-compose.prod.yml
+  DOCKER_COMPOSE_FILE: docker-compose.yml
 
 jobs:
   build-and-deploy:
@@ -37,5 +37,5 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/$DOCKER_IMAGE:latest
-            docker-compose -f $DOCKER_COMPOSE_FILE down
-            docker-compose -f $DOCKER_COMPOSE_FILE up -d
+            docker compose -f $DOCKER_COMPOSE_FILE down
+            docker compose -f $DOCKER_COMPOSE_FILE up -d
