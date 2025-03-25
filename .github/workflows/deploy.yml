@@ -2,7 +2,7 @@ name: Build and Deploy to VPS
 
 on:
   push:
-    branches: [main]
+    branches: [trunk]
 
 env:
   VPS_IP: ${{ secrets.VPS_IP }}
