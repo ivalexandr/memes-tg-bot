@@ -6,7 +6,7 @@ on:
 
 env:
   DOCKER_IMAGE: memes-bot
-  DOCKER_COMPOSE_FILE: docker-compose.prod.yml
+  DOCKER_COMPOSE_FILE: docker-compose.yml
 
 jobs:
   build-and-deploy:
