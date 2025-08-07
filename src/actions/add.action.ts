@@ -1,27 +1,33 @@
 import { inject, injectable } from 'inversify';
 import { BotService } from '../services/bot.service';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { MemesRepository } from '../database/repositories/memes.repository';
 import { UserRepository } from '../database/repositories/user.repository';
 import { message } from 'telegraf/filters';
-import path from 'path';
+import { ActionInterface } from '../interfaces/action.interface';
 import { mkdir, writeFile } from 'fs/promises';
+import { TYPES } from '../types';
 import axios from 'axios';
 import sharp from 'sharp';
+import path from 'path';
 
 @injectable()
-export class AddAction {
+export class AddAction implements ActionInterface {
   private userStates = new Set<number>();
 
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private loggerSrv: LoggerInterface,
-    @inject(MemesRepository) private memesRepo: MemesRepository,
-    @inject(UserRepository) private userRepo: UserRepository
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.MemesRepository) private memesRepo: MemesRepository,
+    @inject(TYPES.UserRepository) private userRepo: UserRepository
   ) {}
 
-  add(): void {
+  register(): void {
+    this.add();
+    this.photo();
+  }
+
+  private add(): void {
     this.botSrv.bot.command('add', async (ctx) => {
       const userId = ctx.from.id;
 
@@ -45,7 +51,7 @@ export class AddAction {
     });
   }
 
-  photo(): void {
+  private photo(): void {
     this.botSrv.bot.on(message('photo'), async (ctx) => {
       const userId = ctx.from.id;
 
@@ -90,7 +96,10 @@ export class AddAction {
         } catch (error) {
           if (typeof error === 'string') {
             this.loggerSrv.error(error);
+          } else if (error instanceof Error) {
+            this.loggerSrv.error(error.message);
           }
+
           await ctx.reply('Произошла ошибка загрузки файла, попробуй снова');
         }
       }

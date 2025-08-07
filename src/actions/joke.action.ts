@@ -1,17 +1,20 @@
 import { inject, injectable } from 'inversify';
 import { BotService } from '../services/bot.service';
-import { LoggerService } from '../services/logger.service';
+import { ActionInterface } from '../interfaces/action.interface';
+import { LoggerInterface } from '../interfaces/logger.interface';
+import { TYPES } from '../types';
+
 import iconv from 'iconv-lite';
 import axios from 'axios';
 
 @injectable()
-export class JokeAction {
+export class JokeAction implements ActionInterface {
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private loggerSrv: LoggerService
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface
   ) {}
 
-  sendJoke(): void {
+  register(): void {
     this.botSrv.bot.command('joke', async (ctx) => {
       try {
         const resJoke = await axios.get(
@@ -35,6 +38,8 @@ export class JokeAction {
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
+        } else if (error instanceof Error) {
+          this.loggerSrv.error(error.message);
         }
         await ctx.reply('Произошла ошибка получения анекдота');
       }

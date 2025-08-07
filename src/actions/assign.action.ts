@@ -1,19 +1,20 @@
 import { inject, injectable } from 'inversify';
 import { UserRepository } from '../database/repositories/user.repository';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
 import { Role } from '../database/enums/role.enum';
+import { ActionInterface } from '../interfaces/action.interface';
+import { TYPES } from '../types';
 
 @injectable()
-export class AssignAction {
+export class AssignAction implements ActionInterface {
   constructor(
-    @inject(UserRepository) private userRepo: UserRepository,
-    @inject(LoggerService) private loggerSrv: LoggerInterface,
-    @inject(BotService) private botSrv: BotService
+    @inject(TYPES.UserRepository) private userRepo: UserRepository,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.BotService) private botSrv: BotService
   ) {}
 
-  assign(): void {
+  register(): void {
     this.botSrv.bot.command('assign', async (ctx) => {
       const userId = ctx.from.id;
       try {
@@ -62,6 +63,8 @@ export class AssignAction {
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
+        } else if (error instanceof Error) {
+          this.loggerSrv.error(error.message);
         }
 
         await ctx.reply(

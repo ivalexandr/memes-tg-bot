@@ -1,13 +1,16 @@
 import { inject, injectable } from 'inversify';
-import { DatabaseService } from '../services/database.service';
+import { DatabaseService } from '../../services/database.service';
 import { Repository } from 'typeorm';
 import { Memes } from '../entities/memes.entity';
+import { TYPES } from '../../types';
 
 @injectable()
 export class MemesRepository {
   private repo: Repository<Memes>;
 
-  constructor(@inject(DatabaseService) private databaseSrv: DatabaseService) {
+  constructor(
+    @inject(TYPES.DatabaseService) private databaseSrv: DatabaseService
+  ) {
     this.repo = this.databaseSrv.dataSource.getRepository(Memes);
   }
 

@@ -3,11 +3,16 @@
   "version": "0.0.1",
   "main": "index.ts",
   "scripts": {
-    "start:dev": "nodemon",
+    "start:dev": "npm run generate:types && nodemon",
     "start:prod": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "generate:types": "node -r esbuild-register scripts/generate-types.script.ts"
   },
-  "keywords": [],
+  "keywords": [
+    "bot",
+    "telegram",
+    "telegraf"
+  ],
   "author": "",
   "license": "ISC",
   "description": "Bot for memes",
@@ -17,6 +22,7 @@
     "@types/signale": "^1.4.7",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.1",
+    "ts-morph": "^26.0.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
