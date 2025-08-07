@@ -7,6 +7,7 @@ import { glob } from 'glob';
 import { TYPES } from './types';
 import { checkAction } from './utils/check-action.util';
 import path from 'path';
+import { outboxMiddleware } from './middlewares/outbox.middleware';
 
 const registerServices = async (
   container: Container,
@@ -57,6 +58,13 @@ const bootstrap = async (): Promise<void> => {
     });
 
   container.get<CommandMenuService>(TYPES.CommandMenuService).drawMenu();
+
+  bot.bot.use(
+    outboxMiddleware(
+      container.get(TYPES.BotMessageRepository),
+      container.get(TYPES.LoggerService)
+    )
+  );
 
   await bot.initialize();
 
