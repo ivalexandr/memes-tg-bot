@@ -1,13 +1,14 @@
 import { inject, injectable } from 'inversify';
 import { LoggerService } from '../services/logger.service';
 import { BotService } from '../services/bot.service';
+import { LoggerInterface } from '../interfaces/logger.interface';
 import { message } from 'telegraf/filters';
 
 @injectable()
 export class KeywordAction {
   constructor(
     @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private logger: LoggerService
+    @inject(LoggerService) private logger: LoggerInterface
   ) {}
 
   private keywordsMap: Record<string, string> = {
@@ -20,8 +21,12 @@ export class KeywordAction {
   };
 
   sendMessage(): void {
-    this.botSrv.bot.on(message('text'), async (ctx) => {
+    this.botSrv.bot.on(message('text'), async (ctx, next) => {
       const text = ctx.message.text.toLowerCase();
+
+      if (text.startsWith('/')) {
+        return await next();
+      }
 
       for (const keyword in this.keywordsMap) {
         if (text.trim() === keyword) {
