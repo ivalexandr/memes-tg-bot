@@ -1,15 +1,15 @@
 import { inject, injectable } from 'inversify';
-import { LoggerService } from '../services/logger.service';
 import { BotService } from '../services/bot.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { message } from 'telegraf/filters';
 import { ActionInterface } from '../interfaces/action.interface';
+import { TYPES } from '../types';
 
 @injectable()
 export class KeywordAction implements ActionInterface {
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private logger: LoggerInterface
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private logger: LoggerInterface
   ) {}
 
   private keywordsMap: Record<string, string> = {

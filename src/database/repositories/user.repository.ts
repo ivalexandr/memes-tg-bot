@@ -1,14 +1,17 @@
-import { DatabaseService } from '../services/database.service';
+import { DatabaseService } from '../../services/database.service';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { inject, injectable } from 'inversify';
 import { Role } from '../enums/role.enum';
+import { TYPES } from '../../types';
 
 @injectable()
 export class UserRepository {
   private repo: Repository<User>;
 
-  constructor(@inject(DatabaseService) private databaseSrv: DatabaseService) {
+  constructor(
+    @inject(TYPES.DatabaseService) private databaseSrv: DatabaseService
+  ) {
     this.repo = this.databaseSrv.dataSource.getRepository(User);
   }
 

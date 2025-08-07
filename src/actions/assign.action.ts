@@ -1,17 +1,17 @@
 import { inject, injectable } from 'inversify';
 import { UserRepository } from '../database/repositories/user.repository';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
 import { Role } from '../database/enums/role.enum';
 import { ActionInterface } from '../interfaces/action.interface';
+import { TYPES } from '../types';
 
 @injectable()
 export class AssignAction implements ActionInterface {
   constructor(
-    @inject(UserRepository) private userRepo: UserRepository,
-    @inject(LoggerService) private loggerSrv: LoggerInterface,
-    @inject(BotService) private botSrv: BotService
+    @inject(TYPES.UserRepository) private userRepo: UserRepository,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.BotService) private botSrv: BotService
   ) {}
 
   register(): void {

@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { BotService } from './bot.service';
 import { BotCommand } from 'telegraf/types';
+import { TYPES } from '../types';
 
 @injectable()
 export class CommandMenuService {
@@ -14,7 +15,7 @@ export class CommandMenuService {
     { command: 'help', description: 'Помощь' },
   ] as const;
 
-  constructor(@inject(BotService) private botSrv: BotService) {}
+  constructor(@inject(TYPES.BotService) private botSrv: BotService) {}
 
   drawMenu(): void {
     this.botSrv.bot.telegram.setMyCommands(this.commands);

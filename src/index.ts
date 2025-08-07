@@ -1,18 +1,12 @@
 import 'reflect-metadata';
-import { DatabaseService } from './database/services/database.service';
+import { DatabaseService } from './services/database.service';
 import { BotService } from './services/bot.service';
-import { Container } from 'inversify';
-import { StartAction } from './actions/start.action';
+import { Container, interfaces } from 'inversify';
 import { CommandMenuService } from './services/command-menu.service';
-import { HelpAction } from './actions/help.action';
 import { glob } from 'glob';
-import { AddAction } from './actions/add.action';
-import { GetAction } from './actions/get.actions';
-import { AssignAction } from './actions/assign.action';
-import { KeywordAction } from './actions/keyword.action';
-import { JokeAction } from './actions/joke.action';
+import { TYPES } from './types';
+import { checkAction } from './utils/check-action.util';
 import path from 'path';
-import { ActionInterface } from './interfaces/action.interface';
 
 const registerServices = async (
   container: Container,
@@ -26,9 +20,15 @@ const registerServices = async (
     const module = require(file);
     for (const key in module) {
       if (Object.prototype.hasOwnProperty.call(module, key)) {
-        const exportedClass = module[key];
-        if (Reflect.getMetadata('inversify:paramtypes', exportedClass)) {
-          container.bind(exportedClass).to(exportedClass).inSingletonScope();
+        const exportedClass = module[key] as interfaces.Newable;
+
+        const typeKey = exportedClass.name as keyof typeof TYPES;
+
+        if (
+          Object.prototype.hasOwnProperty.call(TYPES, typeKey) &&
+          Reflect.getMetadata('inversify:paramtypes', exportedClass)
+        ) {
+          container.bind(TYPES[typeKey]).to(exportedClass).inSingletonScope();
         }
       }
     }
@@ -38,8 +38,6 @@ const registerServices = async (
 const bootstrap = async (): Promise<void> => {
   const container = new Container();
 
-  container.bind(DatabaseService).to(DatabaseService).inSingletonScope();
-
   await registerServices(container, path.join(__dirname, './services'));
   await registerServices(
     container,
@@ -47,23 +45,18 @@ const bootstrap = async (): Promise<void> => {
   );
   await registerServices(container, path.join(__dirname, './actions'));
 
-  const database = container.get(DatabaseService);
-  const bot = container.get(BotService);
+  const database = container.get<DatabaseService>(TYPES.DatabaseService);
+  const bot = container.get<BotService>(TYPES.BotService);
   await database.initialize();
 
-  const actions: ActionInterface[] = [
-    container.get(StartAction),
-    container.get(HelpAction),
-    container.get(GetAction),
-    container.get(AssignAction),
-    container.get(KeywordAction),
-    container.get(JokeAction),
-    container.get(AddAction),
-  ];
+  Object.values(TYPES)
+    .map((token) => container.get(token))
+    .filter((action) => checkAction(action))
+    .forEach((action) => {
+      action.register();
+    });
 
-  container.get(CommandMenuService).drawMenu();
-
-  actions.forEach((action) => action.register());
+  container.get<CommandMenuService>(TYPES.CommandMenuService).drawMenu();
 
   await bot.initialize();
 

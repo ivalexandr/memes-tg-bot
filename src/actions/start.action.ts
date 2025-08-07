@@ -1,20 +1,20 @@
 import { inject, injectable } from 'inversify';
 import { BotService } from '../services/bot.service';
 import { Telegraf } from 'telegraf';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { UserRepository } from '../database/repositories/user.repository';
 import { Role } from '../database/enums/role.enum';
 import { ActionInterface } from '../interfaces/action.interface';
+import { TYPES } from '../types';
 
 @injectable()
 export class StartAction implements ActionInterface {
   private bot: Telegraf;
 
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private loggerSrv: LoggerInterface,
-    @inject(UserRepository) private userRepo: UserRepository
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.UserRepository) private userRepo: UserRepository
   ) {
     this.bot = this.botSrv.bot;
   }

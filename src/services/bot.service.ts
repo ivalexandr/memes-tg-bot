@@ -1,13 +1,13 @@
 import { Telegraf } from 'telegraf';
-import { LoggerService } from './logger.service';
 import { inject, injectable } from 'inversify';
 import { LoggerInterface } from '../interfaces/logger.interface';
+import { TYPES } from '../types';
 
 @injectable()
 export class BotService {
   private _bot!: Telegraf;
 
-  constructor(@inject(LoggerService) private loggerSrv: LoggerInterface) {
+  constructor(@inject(TYPES.LoggerService) private loggerSrv: LoggerInterface) {
     this.createBot();
   }
 

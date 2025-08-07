@@ -1,15 +1,15 @@
 import { DataSource } from 'typeorm';
-import { User } from '../entities/user.entity';
-import { LoggerInterface } from '../../interfaces/logger.interface';
+import { User } from '../database/entities/user.entity';
+import { LoggerInterface } from '../interfaces/logger.interface';
 import { inject, injectable } from 'inversify';
-import { LoggerService } from '../../services/logger.service';
-import { Memes } from '../entities/memes.entity';
+import { Memes } from '../database/entities/memes.entity';
+import { TYPES } from '../types';
 
 @injectable()
 export class DatabaseService {
   private _datasource: DataSource;
 
-  constructor(@inject(LoggerService) private loggerSrv: LoggerInterface) {
+  constructor(@inject(TYPES.LoggerService) private loggerSrv: LoggerInterface) {
     const logging = process.env.NODE_ENV === 'development';
     this._datasource = new DataSource({
       type: 'better-sqlite3',

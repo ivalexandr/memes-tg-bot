@@ -1,11 +1,10 @@
-// src/actions/RandomReactionsAction.ts
 import { injectable, inject } from 'inversify';
 import { message } from 'telegraf/filters';
 import { BotService } from '../services/bot.service';
 import { ReactionType } from 'telegraf/types';
 import { ActionInterface } from '../interfaces/action.interface';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
+import { TYPES } from '../types';
 
 @injectable()
 export class RandomReactionsAction implements ActionInterface {
@@ -22,8 +21,8 @@ export class RandomReactionsAction implements ActionInterface {
   ];
 
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private loggerSrv: LoggerInterface
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface
   ) {}
 
   public register(): void {

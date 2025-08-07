@@ -1,19 +1,19 @@
 import { inject, injectable } from 'inversify';
 import { MemesRepository } from '../database/repositories/memes.repository';
 import { UserRepository } from '../database/repositories/user.repository';
-import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
-import path from 'path';
 import { ActionInterface } from '../interfaces/action.interface';
+import { TYPES } from '../types';
+import path from 'path';
 
 @injectable()
 export class GetAction implements ActionInterface {
   constructor(
-    @inject(MemesRepository) private memesRepo: MemesRepository,
-    @inject(UserRepository) private userRepo: UserRepository,
-    @inject(LoggerService) private loggerSrv: LoggerInterface,
-    @inject(BotService) private botSrv: BotService
+    @inject(TYPES.MemesRepository) private memesRepo: MemesRepository,
+    @inject(TYPES.UserRepository) private userRepo: UserRepository,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.BotService) private botSrv: BotService
   ) {}
 
   register(): void {

@@ -1,16 +1,17 @@
 import { inject, injectable } from 'inversify';
 import { BotService } from '../services/bot.service';
-import { LoggerService } from '../services/logger.service';
 import { ActionInterface } from '../interfaces/action.interface';
 import { LoggerInterface } from '../interfaces/logger.interface';
+import { TYPES } from '../types';
+
 import iconv from 'iconv-lite';
 import axios from 'axios';
 
 @injectable()
 export class JokeAction implements ActionInterface {
   constructor(
-    @inject(BotService) private botSrv: BotService,
-    @inject(LoggerService) private loggerSrv: LoggerInterface
+    @inject(TYPES.BotService) private botSrv: BotService,
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface
   ) {}
 
   register(): void {
