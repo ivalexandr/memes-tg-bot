@@ -10,6 +10,7 @@ import { AddAction } from './actions/add.action';
 import { GetAction } from './actions/get.actions';
 import { AssignAction } from './actions/assign.action';
 import path from 'path';
+import { KeywordAction } from './actions/keyword.action';
 
 const registerServices = async (
   container: Container,
@@ -53,6 +54,7 @@ const bootstrap = async (): Promise<void> => {
   container.get(HelpAction).openHelp();
   container.get(GetAction).getMemes();
   container.get(AssignAction).assign();
+  container.get(KeywordAction).sendMessage();
 
   const addAction = container.get(AddAction);
   addAction.add();
