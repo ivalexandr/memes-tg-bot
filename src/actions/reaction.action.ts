@@ -1,15 +1,15 @@
 import { injectable, inject } from 'inversify';
 import { message } from 'telegraf/filters';
 import { BotService } from '../services/bot.service';
-import { ReactionType } from 'telegraf/types';
+import { ReactionType, ReactionTypeEmoji } from 'telegraf/types';
 import { ActionInterface } from '../interfaces/action.interface';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { TYPES } from '../types';
 
 @injectable()
 export class RandomReactionsAction implements ActionInterface {
-  private readonly probability = 0.1;
-  private readonly emojiPool: ReactionType[] = [
+  private readonly probability = 0.2;
+  private readonly emojiPool: ReactionTypeEmoji[] = [
     { emoji: '👍', type: 'emoji' },
     { emoji: '🔥', type: 'emoji' },
     { emoji: '😁', type: 'emoji' },
@@ -25,7 +25,7 @@ export class RandomReactionsAction implements ActionInterface {
     @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface
   ) {}
 
-  public register(): void {
+  register(): void {
     this.botSrv.bot.on(message('text'), async (ctx, next) => {
       if (ctx.message.text.startsWith('/')) return await next();
 
@@ -43,7 +43,7 @@ export class RandomReactionsAction implements ActionInterface {
         );
 
         this.loggerSrv.info(
-          `🎯 Поставлена реакция ${randomEmoji} на сообщение: ${ctx.message.text}`
+          `🎯 Поставлена реакция ${randomEmoji.emoji} на сообщение: ${ctx.message.text}`
         );
       } catch (error) {
         if (typeof error === 'string') {
