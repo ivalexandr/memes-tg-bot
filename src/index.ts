@@ -9,9 +9,9 @@ import { glob } from 'glob';
 import { AddAction } from './actions/add.action';
 import { GetAction } from './actions/get.actions';
 import { AssignAction } from './actions/assign.action';
-import path from 'path';
 import { KeywordAction } from './actions/keyword.action';
 import { JokeAction } from './actions/joke.action';
+import path from 'path';
 
 const registerServices = async (
   container: Container,
