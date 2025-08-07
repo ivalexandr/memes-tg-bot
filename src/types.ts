@@ -2,6 +2,8 @@
 export const TYPES = {
   AddAction: Symbol.for('AddAction'),
   AssignAction: Symbol.for('AssignAction'),
+  BackgroundCleanupCronService: Symbol.for('BackgroundCleanupCronService'),
+  BotMessageRepository: Symbol.for('BotMessageRepository'),
   BotService: Symbol.for('BotService'),
   CommandMenuService: Symbol.for('CommandMenuService'),
   DatabaseService: Symbol.for('DatabaseService'),
@@ -12,6 +14,7 @@ export const TYPES = {
   LoggerService: Symbol.for('LoggerService'),
   MemesRepository: Symbol.for('MemesRepository'),
   RandomReactionsAction: Symbol.for('RandomReactionsAction'),
+  ReactionResponseAction: Symbol.for('ReactionResponseAction'),
   StartAction: Symbol.for('StartAction'),
   UserRepository: Symbol.for('UserRepository'),
 } as const;
