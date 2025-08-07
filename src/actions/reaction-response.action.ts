@@ -39,8 +39,6 @@ export class ReactionResponseAction implements ActionInterface {
             { reply_parameters: { message_id: reactedMsgID } }
           );
         }
-
-        await this.botMsgRepo.purgeOlderThan(30);
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
