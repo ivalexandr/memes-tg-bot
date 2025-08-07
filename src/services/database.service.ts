@@ -13,7 +13,7 @@ export class DatabaseService {
     const logging = process.env.NODE_ENV === 'development';
     this._datasource = new DataSource({
       type: 'better-sqlite3',
-      database: `${__dirname}/../db/memes_bot.sqlite`,
+      database: `${__dirname}/../database/db/memes_bot.sqlite`,
       synchronize: true,
       logging,
       entities: [User, Memes],

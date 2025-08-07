@@ -25,7 +25,10 @@ export class KeywordAction implements ActionInterface {
     this.botSrv.bot.on(message('text'), async (ctx, next) => {
       const text = ctx.message.text.toLowerCase();
 
-      if (text.startsWith('/')) {
+      if (
+        text.startsWith('/') ||
+        !Object.keys(this.keywordsMap).includes(text)
+      ) {
         return await next();
       }
 
