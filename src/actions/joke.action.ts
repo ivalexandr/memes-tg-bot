@@ -1,0 +1,33 @@
+import { inject, injectable } from 'inversify';
+import { BotService } from '../services/bot.service';
+import { LoggerService } from '../services/logger.service';
+import axios from 'axios';
+
+@injectable()
+export class JokeAction {
+  constructor(
+    @inject(BotService) private botSrv: BotService,
+    @inject(LoggerService) private loggerSrv: LoggerService
+  ) {}
+
+  sendJoke(): void {
+    this.botSrv.bot.command('joke', async (ctx) => {
+      try {
+        const resJoke = await axios.get<{ content: string }>(
+          'http://rzhunemogu.ru/RandJSON.aspx?CType=1'
+        );
+        const joke = resJoke.data.content;
+
+        await ctx.reply(joke, {
+          reply_parameters: { message_id: ctx.message.message_id },
+        });
+      } catch (error) {
+        if (typeof error === 'string') {
+          this.loggerSrv.error(error);
+        }
+
+        await ctx.reply('Произошла ошибка получения анекдота');
+      }
+    });
+  }
+}
