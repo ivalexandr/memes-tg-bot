@@ -48,5 +48,11 @@ export class ReactionResponseAction implements ActionInterface {
         await next();
       }
     });
+    this.botSrv.bot.on('message_reaction_count', async (ctx, next) => {
+      this.loggerSrv.info(
+        `message_reaction_count: ${JSON.stringify(ctx.update)}`
+      );
+      return await next();
+    });
   }
 }

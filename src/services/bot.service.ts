@@ -20,10 +20,20 @@ export class BotService {
   }
 
   async initialize(): Promise<void> {
-    await this._bot.launch(() => {
-      this.loggerSrv.info('Бот был запущен...');
-    });
-
+    this._bot.launch(
+      {
+        allowedUpdates: [
+          'message',
+          'edited_message',
+          'callback_query',
+          'message_reaction',
+          'message_reaction_count',
+        ],
+      },
+      () => {
+        this.loggerSrv.info('Бот был запущен...');
+      }
+    );
     this._bot.catch((err) => {
       this.loggerSrv.error(`Ошибка в работе бота: ${err}`);
     });
