@@ -50,6 +50,13 @@ const bootstrap = async (): Promise<void> => {
   const bot = container.get<BotService>(TYPES.BotService);
   await database.initialize();
 
+  bot.bot.use(
+    outboxMiddleware(
+      container.get(TYPES.BotMessageRepository),
+      container.get(TYPES.LoggerService)
+    )
+  );
+
   Object.values(TYPES)
     .map((token) => container.get(token))
     .filter((action) => checkAction(action))
@@ -58,13 +65,6 @@ const bootstrap = async (): Promise<void> => {
     });
 
   container.get<CommandMenuService>(TYPES.CommandMenuService).drawMenu();
-
-  bot.bot.use(
-    outboxMiddleware(
-      container.get(TYPES.BotMessageRepository),
-      container.get(TYPES.LoggerService)
-    )
-  );
 
   await bot.initialize();
 
