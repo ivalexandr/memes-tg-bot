@@ -13,6 +13,10 @@ export class KeywordAction {
   private keywordsMap: Record<string, string> = {
     да: 'пизда',
     нет: 'пидора ответ',
+    где: 'в пизде',
+    молодцы: 'сосут концы',
+    а: 'хуй на',
+    триста: 'отсоси у тракториста',
   };
 
   sendMessage(): void {
@@ -22,7 +26,9 @@ export class KeywordAction {
       for (const keyword in this.keywordsMap) {
         if (text.trim() === keyword) {
           const response = this.keywordsMap[keyword];
-          await ctx.reply(response);
+          await ctx.reply(response, {
+            reply_parameters: { message_id: ctx.message.message_id },
+          });
           this.logger.info(`Слово "${keyword}" вызвало автоответ.`);
           break;
         }
