@@ -5,9 +5,10 @@ import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { UserRepository } from '../database/repositories/user.repository';
 import { Role } from '../database/enums/role.enum';
+import { ActionInterface } from '../interfaces/action.interface';
 
 @injectable()
-export class StartAction {
+export class StartAction implements ActionInterface {
   private bot: Telegraf;
 
   constructor(
@@ -18,7 +19,7 @@ export class StartAction {
     this.bot = this.botSrv.bot;
   }
 
-  start(): void {
+  register(): void {
     this.bot.start(async (ctx) => {
       try {
         const username = ctx.from.first_name || 'Пользователь';

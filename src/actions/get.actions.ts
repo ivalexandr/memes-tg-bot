@@ -5,9 +5,10 @@ import { LoggerService } from '../services/logger.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
 import path from 'path';
+import { ActionInterface } from '../interfaces/action.interface';
 
 @injectable()
-export class GetAction {
+export class GetAction implements ActionInterface {
   constructor(
     @inject(MemesRepository) private memesRepo: MemesRepository,
     @inject(UserRepository) private userRepo: UserRepository,
@@ -15,7 +16,7 @@ export class GetAction {
     @inject(BotService) private botSrv: BotService
   ) {}
 
-  getMemes(): void {
+  register(): void {
     this.botSrv.bot.command('get', async (ctx) => {
       try {
         const userId = ctx.from.id;
@@ -40,7 +41,10 @@ export class GetAction {
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
+        } else if (error instanceof Error) {
+          this.loggerSrv.error(error.message);
         }
+
         await ctx.reply(
           'Произошла ошибка при получении мема, попробуй еще раз'
         );

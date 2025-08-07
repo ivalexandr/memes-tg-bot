@@ -5,13 +5,14 @@ import { LoggerInterface } from '../interfaces/logger.interface';
 import { MemesRepository } from '../database/repositories/memes.repository';
 import { UserRepository } from '../database/repositories/user.repository';
 import { message } from 'telegraf/filters';
-import path from 'path';
+import { ActionInterface } from '../interfaces/action.interface';
 import { mkdir, writeFile } from 'fs/promises';
 import axios from 'axios';
 import sharp from 'sharp';
+import path from 'path';
 
 @injectable()
-export class AddAction {
+export class AddAction implements ActionInterface {
   private userStates = new Set<number>();
 
   constructor(
@@ -21,7 +22,12 @@ export class AddAction {
     @inject(UserRepository) private userRepo: UserRepository
   ) {}
 
-  add(): void {
+  register(): void {
+    this.add();
+    this.photo();
+  }
+
+  private add(): void {
     this.botSrv.bot.command('add', async (ctx) => {
       const userId = ctx.from.id;
 
@@ -45,7 +51,7 @@ export class AddAction {
     });
   }
 
-  photo(): void {
+  private photo(): void {
     this.botSrv.bot.on(message('photo'), async (ctx) => {
       const userId = ctx.from.id;
 
@@ -90,7 +96,10 @@ export class AddAction {
         } catch (error) {
           if (typeof error === 'string') {
             this.loggerSrv.error(error);
+          } else if (error instanceof Error) {
+            this.loggerSrv.error(error.message);
           }
+
           await ctx.reply('Произошла ошибка загрузки файла, попробуй снова');
         }
       }

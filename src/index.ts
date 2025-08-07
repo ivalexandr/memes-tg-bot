@@ -12,6 +12,7 @@ import { AssignAction } from './actions/assign.action';
 import { KeywordAction } from './actions/keyword.action';
 import { JokeAction } from './actions/joke.action';
 import path from 'path';
+import { ActionInterface } from './interfaces/action.interface';
 
 const registerServices = async (
   container: Container,
@@ -50,17 +51,19 @@ const bootstrap = async (): Promise<void> => {
   const bot = container.get(BotService);
   await database.initialize();
 
-  container.get(CommandMenuService).drawMenu();
-  container.get(StartAction).start();
-  container.get(HelpAction).openHelp();
-  container.get(GetAction).getMemes();
-  container.get(AssignAction).assign();
-  container.get(KeywordAction).sendMessage();
-  container.get(JokeAction).sendJoke();
+  const actions: ActionInterface[] = [
+    container.get(StartAction),
+    container.get(HelpAction),
+    container.get(GetAction),
+    container.get(AssignAction),
+    container.get(KeywordAction),
+    container.get(JokeAction),
+    container.get(AddAction),
+  ];
 
-  const addAction = container.get(AddAction);
-  addAction.add();
-  addAction.photo();
+  container.get(CommandMenuService).drawMenu();
+
+  actions.forEach((action) => action.register());
 
   await bot.initialize();
 
