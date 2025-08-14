@@ -34,18 +34,18 @@ export class KeywordAction implements ActionInterface {
       }
 
       try {
-        for (const keyword in this.keywordsMap) {
-          if (text.trim().match(/(сво|svo|zvo)/)?.length) {
-            const response = this.keywordsMap['сво'];
-            await ctx.reply(response, {
-              reply_parameters: {
-                message_id: ctx.message.message_id,
-              },
-            });
-            this.logger.info(`Слово "${keyword}" вызвало автоответ.`);
-            return;
-          }
+        if (text.trim().match(/(сво|svo|zvo)/)?.length) {
+          const response = this.keywordsMap['сво'];
+          await ctx.reply(response, {
+            reply_parameters: {
+              message_id: ctx.message.message_id,
+            },
+          });
+          this.logger.info(`Слово "${text.trim()}" вызвало автоответ.`);
+          return;
+        }
 
+        for (const keyword in this.keywordsMap) {
           if (text.trim() === keyword) {
             const response = this.keywordsMap[keyword];
             await ctx.reply(response, {
