@@ -5,6 +5,7 @@ import { ActionInterface } from '../interfaces/action.interface';
 import { BotMessageRepository } from '../database/repositories/bot-message.repository';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import cron, { ScheduledTask } from 'node-cron';
+import { ConversationRepository } from '../database/repositories/conversation.repository';
 
 @injectable()
 export class BackgroundCleanupCronService implements ActionInterface {
@@ -16,7 +17,9 @@ export class BackgroundCleanupCronService implements ActionInterface {
   constructor(
     @inject(TYPES.BotMessageRepository)
     private botMsgRepo: BotMessageRepository,
-    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface
+    @inject(TYPES.LoggerService) private loggerSrv: LoggerInterface,
+    @inject(TYPES.ConversationRepository)
+    private convSrv: ConversationRepository
   ) {}
 
   register(): void {
@@ -26,6 +29,8 @@ export class BackgroundCleanupCronService implements ActionInterface {
         try {
           const before = Date.now();
           await this.botMsgRepo.purgeOlderThan(this.retainDays);
+          await this.convSrv.purgeOlderThan(this.retainDays);
+
           const took = Date.now() - before;
           this.loggerSrv.info(
             `Cleanup cron done (older than ${this.retainDays}d). Took ${took}ms`

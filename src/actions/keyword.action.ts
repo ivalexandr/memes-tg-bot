@@ -19,7 +19,6 @@ export class KeywordAction implements ActionInterface {
     молодцы: 'сосут концы',
     а: 'хуй на',
     триста: 'отсоси у тракториста',
-    сво: 'Слава Богу Z ❤️СЛАВА Z ❤️АНГЕЛА ХРАНИТЕЛЯ Z КАЖДОМУ ИЗ ВАС ❤️БОЖЕ ХРАНИ Z ❤️СПАСИБО ВАМ НАШИ СВО ❤️ ХРАНИ ZOV✊ СПАСИБО НАШИМ БОЙЦАМ',
   };
 
   register(): void {
@@ -34,17 +33,6 @@ export class KeywordAction implements ActionInterface {
       }
 
       try {
-        if (text.trim().match(/(сво|svo|zvo)/)?.length) {
-          const response = this.keywordsMap['сво'];
-          await ctx.reply(response, {
-            reply_parameters: {
-              message_id: ctx.message.message_id,
-            },
-          });
-          this.logger.info(`Слово "${text.trim()}" вызвало автоответ.`);
-          return;
-        }
-
         for (const keyword in this.keywordsMap) {
           if (text.trim() === keyword) {
             const response = this.keywordsMap[keyword];

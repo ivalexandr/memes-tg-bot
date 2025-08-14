@@ -52,6 +52,11 @@ jobs:
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             NODE_ENV=${{ secrets.NODE_ENV }}
             OWNER_ID=${{ secrets.OWNER_ID }}
+            DEEPSEEK_TOKEN=${{ secrets.DEEPSEEK_TOKEN }}
+            DEEPSEEK_URL=${{ secrets.DEEPSEEK_URL }}
+            DEEPSEEK_MODEL=${{ secrets.DEEPSEEK_MODEL }}
+            CONTEXT_TTL_HOURS=${{ secrets.CONTEXT_TTL_HOURS }}
+            CONTEXT_MAX_TURNS=${{ secrets.CONTEXT_MAX_TURNS }}
             EOF
 
       - name: Deploy to VPS
