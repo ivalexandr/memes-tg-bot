@@ -36,7 +36,7 @@ export class KeywordAction implements ActionInterface {
 
       try {
         for (const keyword in this.keywordsMap) {
-          if (['svo', 'сво'].includes(text)) {
+          if (['svo', 'сво'].includes(text.trim())) {
             const response = this.keywordsMap[keyword];
             await ctx.reply(response, {
               reply_parameters: {
@@ -44,7 +44,7 @@ export class KeywordAction implements ActionInterface {
               },
             });
             this.logger.info(`Слово "${keyword}" вызвало автоответ.`);
-            break;
+            return;
           }
 
           if (text.trim() === keyword) {
