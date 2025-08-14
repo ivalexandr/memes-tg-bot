@@ -36,7 +36,7 @@ export class KeywordAction implements ActionInterface {
 
       try {
         for (const keyword in this.keywordsMap) {
-          if (['svo', 'сво'].includes(text.trim())) {
+          if (/(svo|сво)/.test(text.trim())) {
             const response = this.keywordsMap[keyword];
             await ctx.reply(response, {
               reply_parameters: {
