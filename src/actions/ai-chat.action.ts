@@ -112,7 +112,7 @@ export class AiChatAction implements ActionInterface {
 
       const sent = await ctx.reply(answer, {
         reply_parameters: { message_id: messageId },
-        parse_mode: 'MarkdownV2',
+        parse_mode: 'Markdown',
       });
 
       return sent;
