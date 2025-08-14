@@ -49,7 +49,8 @@ export class AiChatAction implements ActionInterface {
       if (text.startsWith('/')) return await next();
 
       if (chatType === 'private') {
-        return this.handleQuery(ctx, text);
+        console.log('2324');
+        return await this.handleQuery(ctx, text);
       }
 
       const mentioned =
@@ -62,7 +63,7 @@ export class AiChatAction implements ActionInterface {
           ? text.replace(new RegExp(`@${this.botUsername}\\b`, 'ig'), '').trim()
           : text;
         if (clean.length === 0) return next();
-        return this.handleQuery(ctx, clean);
+        return await this.handleQuery(ctx, clean);
       }
 
       return await next();

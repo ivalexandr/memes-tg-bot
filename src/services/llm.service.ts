@@ -6,8 +6,8 @@ type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string };
 @injectable()
 export class LlmService {
   private client = new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY!,
-    baseURL: process.env.DEEPSEEK_BASE_URL,
+    apiKey: process.env.DEEPSEEK_TOKEN!,
+    baseURL: process.env.DEEPSEEK_URL,
   });
   private model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
 
