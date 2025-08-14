@@ -19,6 +19,8 @@ export class KeywordAction implements ActionInterface {
     молодцы: 'сосут концы',
     а: 'хуй на',
     триста: 'отсоси у тракториста',
+    сво: 'Слава Богу Z ❤️СЛАВА Z ❤️АНГЕЛА ХРАНИТЕЛЯ Z КАЖДОМУ ИЗ ВАС ❤️БОЖЕ ХРАНИ Z ❤️СПАСИБО ВАМ НАШИ СВО ❤️ ХРАНИ ZOV✊ СПАСИБО НАШИМ БОЙЦАМ',
+    svo: 'Слава Богу Z ❤️СЛАВА Z ❤️АНГЕЛА ХРАНИТЕЛЯ Z КАЖДОМУ ИЗ ВАС ❤️БОЖЕ ХРАНИ Z ❤️СПАСИБО ВАМ НАШИ СВО ❤️ ХРАНИ ZOV✊ СПАСИБО НАШИМ БОЙЦАМ',
   };
 
   register(): void {
@@ -34,6 +36,17 @@ export class KeywordAction implements ActionInterface {
 
       try {
         for (const keyword in this.keywordsMap) {
+          if (['svo', 'сво'].includes(text)) {
+            const response = this.keywordsMap[keyword];
+            await ctx.reply(response, {
+              reply_parameters: {
+                message_id: ctx.message.message_id,
+              },
+            });
+            this.logger.info(`Слово "${keyword}" вызвало автоответ.`);
+            break;
+          }
+
           if (text.trim() === keyword) {
             const response = this.keywordsMap[keyword];
             await ctx.reply(response, {
