@@ -13,6 +13,8 @@ export class CommandMenuService {
     { command: 'add', description: 'Добавить мем' },
     { command: 'assign', description: 'Назначить пользователя админом' },
     { command: 'help', description: 'Помощь' },
+    { command: 'ai', description: 'ИИ помощник' },
+    { command: 'ai_reset', description: 'Очистить контекст ИИ помощника' },
   ] as const;
 
   constructor(@inject(TYPES.BotService) private botSrv: BotService) {}
