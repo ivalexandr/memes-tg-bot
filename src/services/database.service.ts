@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify';
 import { Memes } from '../database/entities/memes.entity';
 import { TYPES } from '../types';
 import { BotMessage } from '../database/entities/bot-message.entity';
+import { Conversation } from '../database/entities/conversation.entity';
 
 @injectable()
 export class DatabaseService {
@@ -17,7 +18,7 @@ export class DatabaseService {
       database: `${__dirname}/../database/db/memes_bot.sqlite`,
       synchronize: true,
       logging,
-      entities: [User, Memes, BotMessage],
+      entities: [User, Memes, BotMessage, Conversation],
     });
   }
 
