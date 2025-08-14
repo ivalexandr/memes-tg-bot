@@ -17,7 +17,6 @@ export const TYPES = {
   LoggerService: Symbol.for('LoggerService'),
   MemesRepository: Symbol.for('MemesRepository'),
   RandomReactionsAction: Symbol.for('RandomReactionsAction'),
-  ReactionResponseAction: Symbol.for('ReactionResponseAction'),
   StartAction: Symbol.for('StartAction'),
   UserRepository: Symbol.for('UserRepository'),
 } as const;
