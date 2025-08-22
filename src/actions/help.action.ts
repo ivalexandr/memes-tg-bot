@@ -8,10 +8,11 @@ export class HelpAction implements ActionInterface {
   constructor(@inject(TYPES.BotService) private botSrv: BotService) {}
 
   register(): void {
-    this.botSrv.bot.help(async (ctx) => {
+    this.botSrv.bot.help(async (ctx, next) => {
       await ctx.reply(
         'В данном боте можно добавлять новые мемы (если вы админ) и получать рандомные мемы по команде \/get'
       );
+      return await next();
     });
   }
 }

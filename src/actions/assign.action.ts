@@ -15,21 +15,21 @@ export class AssignAction implements ActionInterface {
   ) {}
 
   register(): void {
-    this.botSrv.bot.command('assign', async (ctx) => {
+    this.botSrv.bot.command('assign', async (ctx, next) => {
       const userId = ctx.from.id;
       try {
         if (!(await this.userRepo.isUserExists(userId))) {
           await ctx.reply(
             'Ты не зарегистрирован, зарегистрироваться нужно с помощью комманды \/start'
           );
-          return;
+          return await next();
         }
 
         if (!(await this.userRepo.isUserAdmin(userId))) {
           await ctx.reply(
             'Ты не являешься админом, поэтому не можешь назначить других пользователей админами'
           );
-          return;
+          return await next();
         }
 
         const commandArguments = ctx.message.text.split(' ');
@@ -38,7 +38,7 @@ export class AssignAction implements ActionInterface {
           await ctx.reply(
             'Необходимо ввести комманду вместе с тегом пользователя в формате \/assign username'
           );
-          return;
+          return await next();
         }
 
         const userToAssign = commandArguments[1];
@@ -49,7 +49,7 @@ export class AssignAction implements ActionInterface {
           await ctx.reply(
             `Пользователь ${userToAssign} не зарегистрирован в боте`
           );
-          return;
+          return await next();
         }
 
         user.role = Role.Admin;
@@ -60,6 +60,7 @@ export class AssignAction implements ActionInterface {
           `Пользователь ${user.tgId} был назначен админом и теперь может доабвлять свои мемы`
         );
         await ctx.reply(`Пользователь ${user.tag} был назначен админом`);
+        return await next();
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
@@ -70,6 +71,7 @@ export class AssignAction implements ActionInterface {
         await ctx.reply(
           'Произошла ошибка назначения пользователя админом, попробуй позже'
         );
+        return await next();
       }
     });
   }

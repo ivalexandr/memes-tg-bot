@@ -20,7 +20,7 @@ export class StartAction implements ActionInterface {
   }
 
   register(): void {
-    this.bot.start(async (ctx) => {
+    this.bot.start(async (ctx, next) => {
       try {
         const username = ctx.from.first_name || 'Пользователь';
         const userId = ctx.from.id;
@@ -31,7 +31,7 @@ export class StartAction implements ActionInterface {
           await ctx.reply(
             `Привет, ${username}! 👋 Добро пожаловать в бот мемасов`
           );
-          return;
+          return await next();
         }
 
         const role =
@@ -50,6 +50,7 @@ export class StartAction implements ActionInterface {
         await ctx.reply(
           `Привет, ${username}! 👋 Добро пожаловать в бот мемасов`
         );
+        return await next();
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
@@ -57,6 +58,7 @@ export class StartAction implements ActionInterface {
         await ctx.reply(
           'Произошла ошибка при регистрации в боте, попробуй еще раз'
         );
+        return await next();
       }
     });
   }
