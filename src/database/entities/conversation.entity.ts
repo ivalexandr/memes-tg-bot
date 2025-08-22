@@ -13,7 +13,7 @@ export class Conversation {
 
   @Index()
   @Column({ type: 'varchar' })
-  userTgId!: string;
+  chatId!: string;
 
   @Column({ type: 'text' })
   history!: string;

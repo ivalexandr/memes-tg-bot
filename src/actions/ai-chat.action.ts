@@ -1,4 +1,3 @@
-// src/actions/ai-chat.action.ts
 import { inject, injectable } from 'inversify';
 import { message } from 'telegraf/filters';
 import { TYPES } from '../types';
@@ -11,6 +10,7 @@ import { LlmService } from '../services/llm.service';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
 import { Context } from 'telegraf';
+import { makeContextKey } from '../utils/make-context-key.util';
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string };
 
@@ -26,12 +26,16 @@ export class AiChatAction implements ActionInterface {
     @inject(TYPES.LoggerService) private logger: LoggerInterface
   ) {}
 
-  public async register() {
+  async register() {
     const me = await this.botSrv.bot.telegram.getMe();
     this.botUsername = me.username;
 
     this.botSrv.bot.command('ai_reset', async (ctx, next) => {
-      await this.convRepo.clear(ctx.from.id);
+      const key = makeContextKey(ctx);
+
+      if (!key) return await next();
+
+      await this.convRepo.clear(key);
       await ctx.reply('🧹 Контекст очищен.');
       return await next();
     });
@@ -43,7 +47,7 @@ export class AiChatAction implements ActionInterface {
         return await next();
       }
 
-      await this.handleQuery(ctx, text, next);
+      await this.handleQuery(ctx, text);
       return await next();
     });
 
@@ -54,7 +58,7 @@ export class AiChatAction implements ActionInterface {
       if (text.startsWith('/')) return await next();
 
       if (chatType === 'private') {
-        await this.handleQuery(ctx, text, next);
+        await this.handleQuery(ctx, text);
         return await next();
       }
 
@@ -68,7 +72,7 @@ export class AiChatAction implements ActionInterface {
           ? text.replace(new RegExp(`@${this.botUsername}\\b`, 'ig'), '').trim()
           : text;
         if (clean.length === 0) return await next();
-        await this.handleQuery(ctx, clean, next);
+        await this.handleQuery(ctx, clean);
         return await next();
       }
 
@@ -76,22 +80,18 @@ export class AiChatAction implements ActionInterface {
     });
   }
 
-  private async handleQuery(
-    ctx: Context,
-    userText: string,
-    next: () => Promise<void>
-  ) {
+  private async handleQuery(ctx: Context, userText: string) {
     try {
       await ctx.sendChatAction('typing');
 
-      const userId = ctx.from?.id;
+      const key = makeContextKey(ctx);
 
-      if (!userId) {
+      if (!key) {
         await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-        return await next();
+        return;
       }
 
-      const history = await this.convRepo.getHistory(userId);
+      const history = await this.convRepo.getHistory(key);
 
       const systemPrompt: ChatMsg = {
         role: 'system',
@@ -113,13 +113,13 @@ export class AiChatAction implements ActionInterface {
         { role: 'assistant', content: answer },
       ] satisfies Message[];
 
-      await this.convRepo.setHistory(userId, newHistory);
+      await this.convRepo.setHistory(key, newHistory);
 
       const messageId = ctx.message?.message_id;
 
       if (!messageId) {
         await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-        return await next();
+        return;
       }
 
       const sent = await ctx.reply(answer, {
@@ -131,7 +131,7 @@ export class AiChatAction implements ActionInterface {
     } catch (e) {
       this.logger.error(e instanceof Error ? e.message : String(e));
       await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-      return await next();
+      return;
     }
   }
 }
