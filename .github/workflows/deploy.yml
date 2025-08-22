@@ -6,17 +6,41 @@ on:
       image_tag:
         description: 'Тег образа (по умолчанию latest)'
         type: string
-        required: false
         default: 'latest'
+      prune_after:
+        description: 'docker system prune после деплоя'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
 
 env:
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/memes-bot
   DOCKER_COMPOSE_FILE: docker-compose.prod.yml
+  REMOTE_DIR: /home/${{ secrets.VPS_USER }}/app
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure target dir exists
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            mkdir -p "${{ env.REMOTE_DIR }}"
+
       - name: Upload compose
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -24,7 +48,10 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: ${{ env.DOCKER_COMPOSE_FILE }}
-          target: ~/app/
+          target: ${{ env.REMOTE_DIR }}/
+          strip_components: 0
+          overwrite: true
+          debug: true
 
       - name: Write .env on VPS
         uses: appleboy/ssh-action@v1
@@ -33,8 +60,9 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            mkdir -p ~/app
-            cat > ~/app/.env <<'EOF'
+            set -e
+            umask 077
+            cat > "${{ env.REMOTE_DIR }}/.env" <<'EOF'
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             NODE_ENV=${{ secrets.NODE_ENV }}
             OWNER_ID=${{ secrets.OWNER_ID }}
@@ -53,9 +81,20 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            cd ~/app
+            cd "${{ env.REMOTE_DIR }}"
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
-            docker pull ${{ env.IMAGE_NAME }}:${{ inputs.image_tag || 'latest' }}
-            docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
-            docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
-            docker system prune -af --volumes || true
+            IMAGE_TAG='${{ inputs.image_tag }}'
+            [ -z "$IMAGE_TAG" ] && IMAGE_TAG=latest
+            # тянем образ и поднимаем
+            if command -v docker compose >/dev/null 2>&1; then
+              docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} pull
+              docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
+              docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d --remove-orphans
+            else
+              docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} pull
+              docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
+              docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d --remove-orphans
+            fi
+            if [ "${{ inputs.prune_after }}" = "true" ]; then
+              docker system prune -af || true
+            fi
