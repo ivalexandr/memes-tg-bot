@@ -28,11 +28,11 @@ export class UserRepository {
     return await this.repo.findOneBy({ tag });
   }
 
-  async isUserExists(userId: number): Promise<boolean> {
+  async isUserExists(userId: string): Promise<boolean> {
     return await this.repo.existsBy({ tgId: userId });
   }
 
-  async isUserAdmin(userId: number): Promise<boolean> {
+  async isUserAdmin(userId: string): Promise<boolean> {
     const user = await this.repo.findOneBy({ tgId: userId });
     return user!.role >= Role.Admin;
   }

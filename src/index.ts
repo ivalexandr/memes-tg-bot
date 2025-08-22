@@ -8,6 +8,7 @@ import { TYPES } from './types';
 import { checkAction } from './utils/check-action.util';
 import path from 'path';
 import { outboxMiddleware } from './middlewares/outbox.middleware';
+import { requiredRegisteredMiddleware } from './middlewares/required-registered.moddleware';
 
 const registerServices = async (
   container: Container,
@@ -51,6 +52,10 @@ const bootstrap = async (): Promise<void> => {
   await database.initialize();
 
   bot.bot.use(
+    requiredRegisteredMiddleware(
+      container.get(TYPES.UserRepository),
+      container.get(TYPES.RegistrationCacheService)
+    ),
     outboxMiddleware(
       container.get(TYPES.BotMessageRepository),
       container.get(TYPES.LoggerService)

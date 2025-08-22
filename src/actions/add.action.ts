@@ -31,14 +31,16 @@ export class AddAction implements ActionInterface {
     this.botSrv.bot.command('add', async (ctx, next) => {
       const userId = ctx.from.id;
 
-      if (!(await this.userRepo.isUserExists(userId))) {
+      const userStr = String(userId);
+
+      if (!(await this.userRepo.isUserExists(userStr))) {
         await ctx.reply(
           'Ты не зарегистрирован, для регистрации необходимо отправить команду \/start'
         );
         return await next();
       }
 
-      if (await this.userRepo.isUserAdmin(userId)) {
+      if (await this.userRepo.isUserAdmin(userStr)) {
         this.userStates.add(userId);
         await ctx.reply('Пожалуйста, отправь мне картинку, и я её сохраню');
         return await next();

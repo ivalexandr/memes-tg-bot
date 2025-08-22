@@ -1,7 +1,9 @@
-import { Telegraf } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { inject, injectable } from 'inversify';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { TYPES } from '../types';
+
+export type Ctx = Context;
 
 @injectable()
 export class BotService {
@@ -47,7 +49,7 @@ export class BotService {
         throw new Error('Не передан токен для бота, запуск бота невозможен');
       }
 
-      this._bot = new Telegraf(token);
+      this._bot = new Telegraf<Ctx>(token);
     } catch (error) {
       if (typeof error === 'string') {
         this.loggerSrv.error(error);

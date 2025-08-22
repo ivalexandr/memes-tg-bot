@@ -24,7 +24,9 @@ export class StartAction implements ActionInterface {
       try {
         const username = ctx.from.first_name || 'Пользователь';
         const userId = ctx.from.id;
-        const isExists = await this.userRepo.isUserExists(userId);
+        const strUser = String(userId);
+
+        const isExists = await this.userRepo.isUserExists(strUser);
         const tag = ctx.from.username!;
 
         if (isExists) {
@@ -34,11 +36,10 @@ export class StartAction implements ActionInterface {
           return await next();
         }
 
-        const role =
-          userId === Number(process.env.OWNER_ID) ? Role.Owner : Role.User;
+        const role = strUser === process.env.OWNER_ID ? Role.Owner : Role.User;
 
         await this.userRepo.create({
-          tgId: userId,
+          tgId: strUser,
           nickname: username,
           role,
           tag,

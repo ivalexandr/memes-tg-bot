@@ -8,5 +8,6 @@ declare namespace NodeJS {
     DEEPSEEK_MODEL: string;
     CONTEXT_TTL_HOURS: string;
     CONTEXT_MAX_TURNS: string;
+    EXCLUDE_USER_FOR_KEYWORDS: string;
   }
 }
