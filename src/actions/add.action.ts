@@ -28,31 +28,32 @@ export class AddAction implements ActionInterface {
   }
 
   private add(): void {
-    this.botSrv.bot.command('add', async (ctx) => {
+    this.botSrv.bot.command('add', async (ctx, next) => {
       const userId = ctx.from.id;
 
       if (!(await this.userRepo.isUserExists(userId))) {
         await ctx.reply(
           'Ты не зарегистрирован, для регистрации необходимо отправить команду \/start'
         );
-        return;
+        return await next();
       }
 
       if (await this.userRepo.isUserAdmin(userId)) {
         this.userStates.add(userId);
         await ctx.reply('Пожалуйста, отправь мне картинку, и я её сохраню');
-        return;
+        return await next();
       }
 
       this.loggerSrv.warning(
         `Пользователь ${userId} пытался добавить картинку, но он не является админом`
       );
-      ctx.reply('Чтобы добавлять новые мемы вы должны быть админом');
+      await ctx.reply('Чтобы добавлять новые мемы вы должны быть админом');
+      return await next();
     });
   }
 
   private photo(): void {
-    this.botSrv.bot.on(message('photo'), async (ctx) => {
+    this.botSrv.bot.on(message('photo'), async (ctx, next) => {
       const userId = ctx.from.id;
 
       if (this.userStates.has(userId)) {
@@ -65,7 +66,7 @@ export class AddAction implements ActionInterface {
 
           if (!filePath) {
             await ctx.reply('Не удалось получить файл, попробуй снова');
-            return;
+            return await next();
           }
 
           const createdMemesId = await this.memesRepo.createAndReturnId();
@@ -93,6 +94,7 @@ export class AddAction implements ActionInterface {
           );
           await ctx.reply('Твой мем был удачно загружен!');
           this.userStates.delete(userId);
+          return await next();
         } catch (error) {
           if (typeof error === 'string') {
             this.loggerSrv.error(error);
@@ -101,6 +103,7 @@ export class AddAction implements ActionInterface {
           }
 
           await ctx.reply('Произошла ошибка загрузки файла, попробуй снова');
+          return await next();
         }
       }
     });

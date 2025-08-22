@@ -15,7 +15,7 @@ export class JokeAction implements ActionInterface {
   ) {}
 
   register(): void {
-    this.botSrv.bot.command('joke', async (ctx) => {
+    this.botSrv.bot.command('joke', async (ctx, next) => {
       try {
         const resJoke = await axios.get(
           'http://rzhunemogu.ru/RandJSON.aspx?CType=1',
@@ -35,6 +35,7 @@ export class JokeAction implements ActionInterface {
         await ctx.reply(json.content, {
           reply_parameters: { message_id: ctx.message.message_id },
         });
+        return await next();
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
@@ -42,6 +43,7 @@ export class JokeAction implements ActionInterface {
           this.loggerSrv.error(error.message);
         }
         await ctx.reply('Произошла ошибка получения анекдота');
+        return await next();
       }
     });
   }

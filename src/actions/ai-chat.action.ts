@@ -30,16 +30,21 @@ export class AiChatAction implements ActionInterface {
     const me = await this.botSrv.bot.telegram.getMe();
     this.botUsername = me.username;
 
-    this.botSrv.bot.command('ai_reset', async (ctx) => {
+    this.botSrv.bot.command('ai_reset', async (ctx, next) => {
       await this.convRepo.clear(ctx.from.id);
       await ctx.reply('🧹 Контекст очищен.');
+      return await next();
     });
 
-    this.botSrv.bot.command('ai', async (ctx) => {
+    this.botSrv.bot.command('ai', async (ctx, next) => {
       const text = ctx.message.text.replace(/^\/ai(@\w+)?\s*/i, '').trim();
-      if (!text)
-        return ctx.reply('Напиши запрос после команды: /ai Твой вопрос');
-      await this.handleQuery(ctx, text);
+      if (!text) {
+        await ctx.reply('Напиши запрос после команды: /ai Твой вопрос');
+        return await next();
+      }
+
+      await this.handleQuery(ctx, text, next);
+      return await next();
     });
 
     this.botSrv.bot.on(message('text'), async (ctx, next) => {
@@ -49,8 +54,8 @@ export class AiChatAction implements ActionInterface {
       if (text.startsWith('/')) return await next();
 
       if (chatType === 'private') {
-        console.log('2324');
-        return await this.handleQuery(ctx, text);
+        await this.handleQuery(ctx, text, next);
+        return await next();
       }
 
       const mentioned =
@@ -62,22 +67,28 @@ export class AiChatAction implements ActionInterface {
         const clean = this.botUsername
           ? text.replace(new RegExp(`@${this.botUsername}\\b`, 'ig'), '').trim()
           : text;
-        if (clean.length === 0) return next();
-        return await this.handleQuery(ctx, clean);
+        if (clean.length === 0) return await next();
+        await this.handleQuery(ctx, clean, next);
+        return await next();
       }
 
       return await next();
     });
   }
 
-  private async handleQuery(ctx: Context, userText: string) {
+  private async handleQuery(
+    ctx: Context,
+    userText: string,
+    next: () => Promise<void>
+  ) {
     try {
       await ctx.sendChatAction('typing');
 
       const userId = ctx.from?.id;
 
       if (!userId) {
-        return ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+        await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+        return await next();
       }
 
       const history = await this.convRepo.getHistory(userId);
@@ -107,7 +118,8 @@ export class AiChatAction implements ActionInterface {
       const messageId = ctx.message?.message_id;
 
       if (!messageId) {
-        return ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+        await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+        return await next();
       }
 
       const sent = await ctx.reply(answer, {
@@ -118,7 +130,8 @@ export class AiChatAction implements ActionInterface {
       return sent;
     } catch (e) {
       this.logger.error(e instanceof Error ? e.message : String(e));
-      return ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+      await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
+      return await next();
     }
   }
 }

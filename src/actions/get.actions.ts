@@ -17,7 +17,7 @@ export class GetAction implements ActionInterface {
   ) {}
 
   register(): void {
-    this.botSrv.bot.command('get', async (ctx) => {
+    this.botSrv.bot.command('get', async (ctx, next) => {
       try {
         const userId = ctx.from.id;
 
@@ -25,13 +25,13 @@ export class GetAction implements ActionInterface {
           await ctx.reply(
             'Для того, чтобы получить мем, сперва зарегистрируйся в боте с помощью команды \/start'
           );
-          return;
+          return await next();
         }
 
         const randomMemes = await this.memesRepo.getRandomMemes();
         if (!randomMemes) {
           await ctx.reply('На данный момент мемов нет, попробуй позже');
-          return;
+          return await next();
         }
 
         ctx.replyWithPhoto({
@@ -48,6 +48,7 @@ export class GetAction implements ActionInterface {
         await ctx.reply(
           'Произошла ошибка при получении мема, попробуй еще раз'
         );
+        return await next();
       }
     });
   }

@@ -43,12 +43,15 @@ export class KeywordAction implements ActionInterface {
             break;
           }
         }
+        return await next();
       } catch (error) {
         if (typeof error === 'string') {
           this.logger.error(error);
         } else if (error instanceof Error) {
           this.logger.error(error.message);
         }
+
+        return await next();
       }
     });
   }

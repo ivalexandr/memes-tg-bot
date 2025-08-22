@@ -18,6 +18,11 @@ export class RandomReactionsAction implements ActionInterface {
     { emoji: '💩', type: 'emoji' },
     { emoji: '⚡', type: 'emoji' },
     { emoji: '👀', type: 'emoji' },
+    { emoji: '🆒', type: 'emoji' },
+    { emoji: '🦄', type: 'emoji' },
+    { emoji: '☃', type: 'emoji' },
+    { emoji: '🤡', type: 'emoji' },
+    { emoji: '🤗', type: 'emoji' },
   ];
 
   constructor(
@@ -45,12 +50,15 @@ export class RandomReactionsAction implements ActionInterface {
         this.loggerSrv.info(
           `🎯 Поставлена реакция ${randomEmoji.emoji} на сообщение: ${ctx.message.text}`
         );
+        return await next();
       } catch (error) {
         if (typeof error === 'string') {
           this.loggerSrv.error(error);
         } else if (error instanceof Error) {
           this.loggerSrv.error(error.message);
         }
+
+        return await next();
       }
     });
   }
