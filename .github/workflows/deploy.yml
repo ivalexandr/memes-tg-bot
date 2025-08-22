@@ -71,6 +71,7 @@ jobs:
             DEEPSEEK_MODEL=${{ secrets.DEEPSEEK_MODEL }}
             CONTEXT_TTL_HOURS=${{ secrets.CONTEXT_TTL_HOURS }}
             CONTEXT_MAX_TURNS=${{ secrets.CONTEXT_MAX_TURNS }}
+            EXCLUDE_USER_FOR_KEYWORDS=${{ secrets.EXCLUDE_USER_FOR_KEYWORDS }}
             EOF
 
       - name: Deploy
