@@ -21,9 +21,9 @@ export class ConversationRepository {
     this.repo = this.databaseSrv.dataSource.getRepository(Conversation);
   }
 
-  async getHistory(chatId: number | string): Promise<Message[]> {
+  async getHistory(key: string): Promise<Message[]> {
     const row = await this.repo.findOne({
-      where: { chatId: String(chatId) },
+      where: { chatId: key },
     });
     if (!row) return [];
 
@@ -52,8 +52,8 @@ export class ConversationRepository {
     }
   }
 
-  async clear(chatId: number | string) {
-    await this.repo.delete({ chatId: String(chatId) });
+  async clear(key: string) {
+    await this.repo.delete({ chatId: key });
   }
 
   async purgeOlderThan(days: number) {
