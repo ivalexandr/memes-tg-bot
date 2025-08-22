@@ -1,54 +1,40 @@
-name: Build and Deploy to VPS
+name: Manual Deploy to VPS
 
 on:
-  push:
-    branches: [trunk]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Тег образа (по умолчанию latest)'
+        type: string
+        required: false
+        default: 'latest'
 
 env:
-  DOCKER_IMAGE: memes-bot
+  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/memes-bot
   DOCKER_COMPOSE_FILE: docker-compose.prod.yml
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
-
-      - name: Prepare deployment files
-        run: |
-          mkdir -p deploy
-          cp ${{ env.DOCKER_COMPOSE_FILE }} deploy/
-
-      - name: Upload files to VPS
+      - name: Upload compose
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: 'deploy/*'
-          target: '~/app/'
-          strip_components: 1
+          source: ${{ env.DOCKER_COMPOSE_FILE }}
+          target: ~/app/
 
-      - name: Create .env on VPS
+      - name: Write .env on VPS
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cat > ~/app/.env <<EOF
+            mkdir -p ~/app
+            cat > ~/app/.env <<'EOF'
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             NODE_ENV=${{ secrets.NODE_ENV }}
             OWNER_ID=${{ secrets.OWNER_ID }}
@@ -59,14 +45,17 @@ jobs:
             CONTEXT_MAX_TURNS=${{ secrets.CONTEXT_MAX_TURNS }}
             EOF
 
-      - name: Deploy to VPS
+      - name: Deploy
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ./app
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+            set -e
+            cd ~/app
+            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+            docker pull ${{ env.IMAGE_NAME }}:${{ inputs.image_tag || 'latest' }}
             docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
             docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
+            docker system prune -af --volumes || true
