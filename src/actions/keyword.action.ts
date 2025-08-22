@@ -23,6 +23,12 @@ export class KeywordAction implements ActionInterface {
 
   register(): void {
     this.botSrv.bot.on(message('text'), async (ctx, next) => {
+      if (
+        String(ctx.message.from.id).trim() ===
+        process.env.EXCLUDE_USER_FOR_KEYWORDS?.trim()
+      )
+        return await next();
+
       const text = ctx.message.text.toLowerCase();
 
       if (

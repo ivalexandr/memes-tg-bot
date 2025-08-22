@@ -17,15 +17,17 @@ export class AssignAction implements ActionInterface {
   register(): void {
     this.botSrv.bot.command('assign', async (ctx, next) => {
       const userId = ctx.from.id;
+      const userStr = String(userId);
+
       try {
-        if (!(await this.userRepo.isUserExists(userId))) {
+        if (!(await this.userRepo.isUserExists(userStr))) {
           await ctx.reply(
             'Ты не зарегистрирован, зарегистрироваться нужно с помощью комманды \/start'
           );
           return await next();
         }
 
-        if (!(await this.userRepo.isUserAdmin(userId))) {
+        if (!(await this.userRepo.isUserAdmin(userStr))) {
           await ctx.reply(
             'Ты не являешься админом, поэтому не можешь назначить других пользователей админами'
           );

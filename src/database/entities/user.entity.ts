@@ -6,8 +6,8 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column('int')
-  tgId!: number;
+  @Column('varchar')
+  tgId!: string;
 
   @Column('text')
   nickname!: string;

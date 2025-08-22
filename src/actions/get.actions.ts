@@ -20,8 +20,9 @@ export class GetAction implements ActionInterface {
     this.botSrv.bot.command('get', async (ctx, next) => {
       try {
         const userId = ctx.from.id;
+        const userStr = String(userId);
 
-        if (!(await this.userRepo.isUserExists(userId))) {
+        if (!(await this.userRepo.isUserExists(userStr))) {
           await ctx.reply(
             'Для того, чтобы получить мем, сперва зарегистрируйся в боте с помощью команды \/start'
           );
