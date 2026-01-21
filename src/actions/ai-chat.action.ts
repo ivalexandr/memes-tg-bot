@@ -2,7 +2,6 @@ import { escapers } from '@telegraf/entity';
 import { inject, injectable } from 'inversify';
 import { Context } from 'telegraf';
 import { message } from 'telegraf/filters';
-import { fmt } from 'telegraf/format';
 import type { Message as TelegrafMessage } from 'telegraf/types';
 import {
   ConversationRepository,
@@ -134,9 +133,9 @@ export class AiChatAction implements ActionInterface {
 
       for (const chunk of chunkedAnswer) {
         const escaped = escapers.MarkdownV2(chunk.join(''));
-        const sent = await ctx.reply(fmt`${escaped}`, {
+        const sent = await ctx.reply(escaped, {
           reply_parameters: { message_id: messageId },
-          parse_mode: 'MarkdownV2',
+          parse_mode: 'HTML',
         });
         sends.push(sent);
       }
