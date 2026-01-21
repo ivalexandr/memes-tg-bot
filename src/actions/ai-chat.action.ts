@@ -1,15 +1,17 @@
 import { inject, injectable } from 'inversify';
+import { Context } from 'telegraf';
 import { message } from 'telegraf/filters';
-import { TYPES } from '../types';
-import { ActionInterface } from '../interfaces/action.interface';
+import type { Message as TelegrafMessage } from 'telegraf/types';
 import {
   ConversationRepository,
   Message,
 } from '../database/repositories/conversation.repository';
-import { LlmService } from '../services/llm.service';
+import { ActionInterface } from '../interfaces/action.interface';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { BotService } from '../services/bot.service';
-import { Context } from 'telegraf';
+import { LlmService } from '../services/llm.service';
+import { TYPES } from '../types';
+import { chunkArray } from '../utils/chunk-array.util';
 import { makeContextKey } from '../utils/make-context-key.util';
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string };
@@ -26,7 +28,7 @@ export class AiChatAction implements ActionInterface {
     @inject(TYPES.LoggerService) private logger: LoggerInterface
   ) {}
 
-  async register() {
+  async register(): Promise<void> {
     const me = await this.botSrv.bot.telegram.getMe();
     this.botUsername = me.username;
 
@@ -80,7 +82,10 @@ export class AiChatAction implements ActionInterface {
     });
   }
 
-  private async handleQuery(ctx: Context, userText: string) {
+  private async handleQuery(
+    ctx: Context,
+    userText: string
+  ): Promise<TelegrafMessage.TextMessage[] | null> {
     try {
       await ctx.sendChatAction('typing');
 
@@ -88,7 +93,7 @@ export class AiChatAction implements ActionInterface {
 
       if (!key) {
         await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-        return;
+        return null;
       }
 
       const history = await this.convRepo.getHistory(key);
@@ -119,19 +124,28 @@ export class AiChatAction implements ActionInterface {
 
       if (!messageId) {
         await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-        return;
+        return null;
       }
 
-      const sent = await ctx.reply(answer, {
-        reply_parameters: { message_id: messageId },
-        parse_mode: 'Markdown',
-      });
+      const chunkedAnswer = chunkArray([...answer], 4096);
+      const sends: TelegrafMessage.TextMessage[] = [];
 
-      return sent;
+      for (const chunk of chunkedAnswer) {
+        const sent = await ctx.reply(
+          chunk.join('').replace(/([_*[\]()~>#+-=|{}.!])/g, '\$1'),
+          {
+            reply_parameters: { message_id: messageId },
+            parse_mode: 'MarkdownV2',
+          }
+        );
+        sends.push(sent);
+      }
+
+      return sends;
     } catch (e) {
       this.logger.error(e instanceof Error ? e.message : String(e));
       await ctx.reply('Упс, что-то пошло не так. Попробуй ещё раз позже 🙏');
-      return;
+      return null;
     }
   }
 }
