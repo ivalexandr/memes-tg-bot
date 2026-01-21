@@ -136,7 +136,7 @@ export class AiChatAction implements ActionInterface {
           .replace(/([_*[\]()~>#+-=|{}.!])/g, '\\\\$1');
         const sent = await ctx.reply(escaped, {
           reply_parameters: { message_id: messageId },
-          parse_mode: 'MarkdownV2',
+          parse_mode: 'Markdown',
         });
         sends.push(sent);
       }
