@@ -26,6 +26,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@telegraf/entity": "^0.7.0",
     "axios": "^1.7.9",
     "better-sqlite3": "^11.9.1",
     "dotenv": "^16.4.5",
