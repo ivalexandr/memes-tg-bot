@@ -131,16 +131,15 @@ export class AiChatAction implements ActionInterface {
       const sends: TelegrafMessage.TextMessage[] = [];
 
       for (const chunk of chunkedAnswer) {
-        const sent = await ctx.reply(
-          chunk.join('').replace(/([_*[\]()~>#+-=|{}.!])/g, '\$1'),
-          {
-            reply_parameters: { message_id: messageId },
-            parse_mode: 'MarkdownV2',
-          }
-        );
+        const escaped = chunk
+          .join('')
+          .replace(/([_*[\]()~>#+-=|{}.!])/g, '\\\\$1');
+        const sent = await ctx.reply(escaped, {
+          reply_parameters: { message_id: messageId },
+          parse_mode: 'MarkdownV2',
+        });
         sends.push(sent);
       }
-
       return sends;
     } catch (e) {
       this.logger.error(e instanceof Error ? e.message : String(e));
