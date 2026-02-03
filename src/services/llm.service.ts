@@ -15,7 +15,7 @@ export class LlmService {
     const resp = await this.client.chat.completions.create({
       model: this.model,
       messages,
-      temperature: 0.7,
+      temperature: 1.5,
     });
     const content = resp.choices?.[0]?.message?.content ?? '';
     return content;
