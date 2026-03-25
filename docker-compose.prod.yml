@@ -3,7 +3,7 @@ services:
     image: ivalexandr/memes-bot:latest
     container_name: memes-bot
     ports:
-      - '3000:3000'
+      - '3000:3001'
     volumes:
       - ./data:/app/dist/memes
       - ./data:/app/dist/database/db
