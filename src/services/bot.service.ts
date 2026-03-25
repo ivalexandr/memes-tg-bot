@@ -56,7 +56,6 @@ export class BotService {
       }
 
       const agent = await createProxyAgent();
-      console.log(agent, '/////////////////');
       this._bot = new Telegraf<Ctx>(token, { telegram: { agent } });
     } catch (error) {
       if (typeof error === 'string') {
