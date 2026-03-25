@@ -1,14 +1,14 @@
-import 'reflect-metadata';
-import { DatabaseService } from './services/database.service';
-import { BotService } from './services/bot.service';
-import { Container, interfaces } from 'inversify';
-import { CommandMenuService } from './services/command-menu.service';
 import { glob } from 'glob';
-import { TYPES } from './types';
-import { checkAction } from './utils/check-action.util';
+import { Container, interfaces } from 'inversify';
 import path from 'path';
+import 'reflect-metadata';
 import { outboxMiddleware } from './middlewares/outbox.middleware';
 import { requiredRegisteredMiddleware } from './middlewares/required-registered.moddleware';
+import { BotService } from './services/bot.service';
+import { CommandMenuService } from './services/command-menu.service';
+import { DatabaseService } from './services/database.service';
+import { TYPES } from './types';
+import { checkAction } from './utils/check-action.util';
 
 const registerServices = async (
   container: Container,
@@ -49,6 +49,7 @@ const bootstrap = async (): Promise<void> => {
 
   const database = container.get<DatabaseService>(TYPES.DatabaseService);
   const bot = container.get<BotService>(TYPES.BotService);
+  await bot.createBot();
   await database.initialize();
 
   bot.bot.use(
