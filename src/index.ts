@@ -49,7 +49,7 @@ const bootstrap = async (): Promise<void> => {
 
   const database = container.get<DatabaseService>(TYPES.DatabaseService);
   const bot = container.get<BotService>(TYPES.BotService);
-  await bot.createBot();
+  bot.createBot();
   await database.initialize();
 
   bot.bot.use(

@@ -3,12 +3,6 @@ import { Context, Telegraf } from 'telegraf';
 import { LoggerInterface } from '../interfaces/logger.interface';
 import { TYPES } from '../types';
 
-const createProxyAgent = async () => {
-  return new (await import('socks-proxy-agent')).SocksProxyAgent(
-    'socks5://82.25.185.13:1080'
-  );
-};
-
 export type Ctx = Context;
 
 @injectable()
@@ -47,7 +41,7 @@ export class BotService {
     });
   }
 
-  async createBot(): Promise<void> {
+  createBot(): void {
     try {
       const token = process.env.BOT_TOKEN;
 
@@ -55,8 +49,7 @@ export class BotService {
         throw new Error('Не передан токен для бота, запуск бота невозможен');
       }
 
-      const agent = await createProxyAgent();
-      this._bot = new Telegraf<Ctx>(token, { telegram: { agent } });
+      this._bot = new Telegraf<Ctx>(token);
     } catch (error) {
       if (typeof error === 'string') {
         this.loggerSrv.error(error);
