@@ -9,13 +9,13 @@ export class LlmService {
     apiKey: process.env.DEEPSEEK_TOKEN!,
     baseURL: process.env.DEEPSEEK_URL,
   });
-  private model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
+  private model = process.env.DEEPSEEK_MODEL ?? 'deepseek-v4-flash';
 
   async chat(messages: ChatMsg[]) {
     const resp = await this.client.chat.completions.create({
       model: this.model,
       messages,
-      temperature: 1.5,
+      temperature: 0.7,
     });
     const content = resp.choices?.[0]?.message?.content ?? '';
     return content;
